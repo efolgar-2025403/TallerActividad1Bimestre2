@@ -18,6 +18,11 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    public List<Producto> listarProductosDisponibles() {
+        return productoRepository.findProductosDisponibles();
+    }
+
+    @Override
     public Producto guardarProducto(Producto producto) {
         return productoRepository.save(producto);
     }
