@@ -433,6 +433,17 @@
                 <small>Sistema de Ventas</small>
             </div>
             <ul class="nav flex-column">
+                <!-- TIENDA (NUEVO) -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tienda/login}">
+                        <i class="bi bi-shop"></i> Tienda
+                    </a>
+                </li>
+
+                <!-- Separador -->
+                <div class="sidebar-divider"></div>
+
+                <!-- GESTIÓN ADMINISTRATIVA -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/web/clientes}">
                         <i class="bi bi-people-fill"></i> Clientes
@@ -457,7 +468,7 @@
                 <!-- Separador -->
                 <div class="sidebar-divider"></div>
 
-                <!-- Enlace del Programador -->
+                <!-- PROGRAMADOR -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/web/programador}">
                         <i class="bi bi-code-slash"></i> Programador
