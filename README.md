@@ -19,8 +19,16 @@ Antes de ejecutar la aplicación, debe tener instalado:
 2. Cambiar a la rama de desarrollo por ejemplo para trabajar con la versión más actualizada
 3. Abrir el proyecto en su IDE
 4. Ejecutar la aplicación con Maven
-5. Abrir Postman y probar los endpoints usando los JSON proporcionados para Clientes, Usuarios, Productos, Ventas y DetalleVentas.
+5. Acceder a la interfaz web: http://localhost:8090/web/clientes
+6. Abrir Postman y probar los endpoints usando los JSON proporcionados para Clientes, Usuarios, Productos, Ventas y DetalleVentas.
 
+
+## Interfaz Web - Thymeleaf
+La aplicación cuenta con una interfaz web completa:
+- **Clientes**: http://localhost:8090/web/clientes
+- **Productos**: http://localhost:8090/web/productos
+- **Usuarios**: http://localhost:8090/web/usuarios
+- **Ventas**: http://localhost:8090/web/ventas
 
 ## Endpoints
 ### Clientes
