@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Clientes</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-3">
+        <a th:href="@{/web/clientes/nuevo}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Cliente
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="dataTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>DPI</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cliente : ${clientes}">
+                        <td th:text="${cliente.DPICliente}"></td>
+                        <td th:text="${cliente.nombreCliente}"></td>
+                        <td th:text="${cliente.apellidoCliente}"></td>
+                        <td th:text="${cliente.direccion}"></td>
+                        <td>
+                                    <span class="badge"
+                                          th:classappend="${cliente.estado == 1} ? 'bg-success' : 'bg-danger'"
+                                          th:text="${cliente.estado == 1} ? 'Activo' : 'Inactivo'"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/web/clientes/editar/{dpi}(dpi=${cliente.DPICliente})}"
+                               class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/web/clientes/eliminar/{dpi}(dpi=${cliente.DPICliente})}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('¿Eliminar este cliente?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
