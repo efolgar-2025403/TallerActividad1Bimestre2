@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Ventas</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-3">
+        <a th:href="@{/web/ventas/nuevo}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nueva Venta
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="dataTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Vendedor</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="venta : ${ventas}">
+                        <td th:text="${venta.codigoVenta}"></td>
+                        <td th:text="${venta.fechaVenta != null ? #dates.format(venta.fechaVenta, 'dd/MM/yyyy') : 'Sin fecha'}"></td>
+                        <td>
+                                    <span th:if="${venta.cliente != null}"
+                                          th:text="${venta.cliente.nombreCliente + ' ' + venta.cliente.apellidoCliente}"></span>
+                            <span th:unless="${venta.cliente != null}" class="text-muted">Sin cliente</span>
+                        </td>
+                        <td>
+                                    <span th:if="${venta.usuario != null}"
+                                          th:text="${venta.usuario.username}"></span>
+                            <span th:unless="${venta.usuario != null}" class="text-muted">Sin vendedor</span>
+                        </td>
+                        <td th:text="'Q ' + ${#numbers.formatDecimal(venta.total, 0, 'COMMA', 2, 'POINT')}"></td>
+                        <td>
+                                    <span class="badge"
+                                          th:classappend="${venta.estado == 1} ? 'bg-success' : 'bg-danger'"
+                                          th:text="${venta.estado == 1} ? 'Activa' : 'Cancelada'"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/web/ventas/editar/{id}(id=${venta.codigoVenta})}"
+                               class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/web/ventas/eliminar/{id}(id=${venta.codigoVenta})}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('¿Eliminar esta venta?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
