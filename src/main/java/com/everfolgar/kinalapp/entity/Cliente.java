@@ -23,7 +23,7 @@ public class Cliente {
     private String direccion;
 
     @Column
-    private Integer estado; // 🔥 CAMBIADO
+    private Integer estado;
 
     public Cliente() {
     }
