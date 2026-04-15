@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' | KinalApp'">KinalApp</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #0a0a0a;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            min-height: 100vh;
+            background: #000000;
+            border-right: 1px solid #D4AF37;
+            box-shadow: 4px 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #cccccc;
+            padding: 14px 20px;
+            margin: 4px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.08);
+            border-color: rgba(212, 175, 55, 0.3);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: #D4AF37;
+        }
+
+        .sidebar-brand {
+            padding: 24px 16px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            margin-bottom: 16px;
+        }
+
+        .sidebar-brand h4 {
+            color: #D4AF37;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-brand small {
+            color: #888888;
+            font-weight: 300;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content-wrapper {
+            background-color: #0d0d0d;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            border-bottom: 1px solid #D4AF37 !important;
+        }
+
+        .page-header h2 {
+            color: #D4AF37;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #111111;
+            border: 1px solid #D4AF37;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+        }
+
+        .card-header {
+            background: #1a1a1a;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            color: #D4AF37;
+            font-weight: 500;
+            padding: 16px 20px;
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        /* ===== TABLES ===== */
+        .table {
+            color: #e0e0e0;
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: #1a1a1a;
+            color: #D4AF37;
+            font-weight: 500;
+            border-bottom: 2px solid #D4AF37;
+            border-top: none;
+            padding: 14px 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #2a2a2a;
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            color: #cccccc;
+            background-color: transparent;
+        }
+
+        /* DataTables customization - SÓLIDO */
+        .dataTables_wrapper {
+            color: #cccccc !important;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            color: #cccccc !important;
+        }
+
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            background-color: #1a1a1a !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #D4AF37 !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: #cccccc !important;
+            background: #1a1a1a !important;
+            border: 1px solid #333333 !important;
+            border-radius: 6px !important;
+            margin: 0 3px !important;
+            padding: 6px 12px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #D4AF37 !important;
+            color: #000000 !important;
+            border-color: #D4AF37 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+       .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #333333 !important;
+        color: #D4AF37 !important;
+        border-color: #D4AF37 !important;
+        font-weight: bold;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            color: #666666 !important;
+            background: #111111 !important;
+            border-color: #333333 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: #111111 !important;
+            color: #666666 !important;
+            border-color: #333333 !important;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .dataTables_info {
+            color: #D4AF37 !important;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .dataTables_length label,
+        .dataTables_filter label {
+            color: #D4AF37 !important;
+        }
+
+        /* ===== BUTTONS - SÓLIDOS ===== */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #D4AF37;
+            border-color: #D4AF37;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #e6c44d;
+            border-color: #e6c44d;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-warning {
+            background: transparent;
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+        }
+
+        .btn-warning:hover {
+            background: #D4AF37;
+            border-color: #D4AF37;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #666666;
+            color: #cccccc;
+        }
+
+        .btn-secondary:hover {
+            background: #333333;
+            border-color: #888888;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-warning {
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+            background: transparent;
+        }
+
+        .btn-outline-warning:hover {
+            background: #D4AF37;
+            color: #000000;
+        }
+
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            background: transparent;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #ffffff;
+        }
+
+        /* ===== FORMS - SÓLIDOS ===== */
+        .form-control, .form-select {
+            background-color: #1a1a1a;
+            border: 1px solid #333333;
+            color: #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #222222;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+            color: #ffffff;
+        }
+
+        .form-control::placeholder {
+            color: #666666;
+        }
+
+        .form-label {
+            color: #D4AF37;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== ALERTS - SÓLIDAS ===== */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #0a2a1a;
+            color: #90EE90;
+            border-left: 4px solid #D4AF37;
+        }
+
+        .alert-danger {
+            background: #2a0a0a;
+            color: #FFB6C1;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* ===== BADGES - SE MANTIENEN COMO ESTÁN (DEGRADADOS) ===== */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .bg-success {
+            background: linear-gradient(135deg, #0d4a0d 0%, #0a3a0a 100%) !important;
+            color: #90EE90;
+            border: 1px solid #00aa00;
+        }
+
+        .bg-danger {
+            background: linear-gradient(135deg, #4a0d0d 0%, #3a0a0a 100%) !important;
+            color: #FFB6C1;
+            border: 1px solid #aa0000;
+        }
+
+        .bg-primary {
+            background: #D4AF37 !important;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .bg-secondary {
+            background: #2a2a2a !important;
+            color: #cccccc;
+            border: 1px solid #444444;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e6c44d;
+        }
+
+        /* ===== TEXT MUTED ===== */
+        .text-muted {
+            color: #888888 !important;
+        }
+
+        /* ===== INFO CARD ===== */
+        .bg-info {
+            background: #D4AF37 !important;
+            border: none;
+        }
+
+        .bg-info .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-md-block sidebar p-0">
+            <div class="sidebar-brand">
+                <h4 class="mb-0">
+                    <i class="bi bi-gem"></i> KinalApp
+                </h4>
+                <small>Sistema de Ventas</small>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/web/clientes}">
+                        <i class="bi bi-people-fill"></i> Clientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/web/productos}">
+                        <i class="bi bi-box-seam"></i> Productos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/web/usuarios}">
+                        <i class="bi bi-person-badge"></i> Usuarios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/web/ventas}">
+                        <i class="bi bi-cart-check"></i> Ventas
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-10 ms-sm-auto px-md-4 content-wrapper">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 page-header">
+                <h2 class="h2" th:text="${titulo}">Título</h2>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${mensaje}" class="alert alert-dismissible fade show"
+                 th:classappend="${tipoMensaje == 'success' ? 'alert-success' : 'alert-danger'}"
+                 role="alert">
+                <i class="bi" th:classappend="${tipoMensaje == 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'}"></i>
+                <span th:text="${mensaje}"></span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Page Content -->
+            <th:block th:insert="~{::content}"></th:block>
+        </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        if ($('#dataTable').length) {
+            $('#dataTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                responsive: true
+            });
+        }
+    });
+</script>
+</body>
+</html>
