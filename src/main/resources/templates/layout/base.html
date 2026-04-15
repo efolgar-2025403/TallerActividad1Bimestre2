@@ -176,11 +176,11 @@
             box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
 
-       .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background: #333333 !important;
-        color: #D4AF37 !important;
-        border-color: #D4AF37 !important;
-        font-weight: bold;
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #D4AF37 !important;
+            color: #000000 !important;
+            border-color: #D4AF37 !important;
+            font-weight: bold;
         }
 
         .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
@@ -345,7 +345,7 @@
             border-left: 4px solid #dc3545;
         }
 
-        /* ===== BADGES - SE MANTIENEN COMO ESTÁN (DEGRADADOS) ===== */
+        /* ===== BADGES ===== */
         .badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -412,6 +412,13 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.2);
             color: #000000;
         }
+
+        /* ===== SEPARADOR EN SIDEBAR ===== */
+        .sidebar-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+            margin: 16px 20px;
+        }
     </style>
 </head>
 <body>
@@ -444,6 +451,16 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/web/ventas}">
                         <i class="bi bi-cart-check"></i> Ventas
+                    </a>
+                </li>
+
+                <!-- Separador -->
+                <div class="sidebar-divider"></div>
+
+                <!-- Enlace del Programador -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/web/programador}">
+                        <i class="bi bi-code-slash"></i> Programador
                     </a>
                 </li>
             </ul>
