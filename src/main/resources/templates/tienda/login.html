@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Acceso a Tienda</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <i class="bi bi-shop" style="color: #D4AF37; font-size: 2rem;"></i>
+                    <h4 class="mt-2">Acceso a Tienda</h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/tienda/login}" method="post">
+                        <div class="mb-4">
+                            <label class="form-label">Ingrese su DPI</label>
+                            <input type="text" name="dpi" class="form-control form-control-lg text-center"
+                                   placeholder="Ej: 1234567890101" required autofocus>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Ingresar
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-4 text-center">
+                        <a th:href="@{/web/clientes}" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-left"></i> Volver al Sistema
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

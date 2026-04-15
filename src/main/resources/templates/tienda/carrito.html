@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Carrito de Compras</title>
+    <style>
+        .carrito-total {
+            background: #1a1a1a;
+            border: 1px solid #D4AF37;
+            border-radius: 12px;
+            padding: 25px;
+        }
+        .total-label {
+            color: #888888;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .total-valor {
+            color: #D4AF37;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .cantidad-input {
+            width: 80px;
+            text-align: center;
+        }
+        .vendedor-select {
+            background: #1a1a1a;
+            border: 1px solid #D4AF37;
+            color: #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+        .vendedor-select:focus {
+            background: #222222;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+            color: #ffffff;
+        }
+        .vendedor-select option {
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="col-12">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 style="color: #D4AF37;">
+                    <i class="bi bi-cart3"></i> Carrito de Compras
+                </h4>
+                <div>
+                    <a th:href="@{/tienda/catalogo}" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-left"></i> Seguir Comprando
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tabla del carrito -->
+            <div class="card mb-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Precio Unit.</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-center">Subtotal</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${items}">
+                                <td>
+                                    <strong style="color: #D4AF37;" th:text="${item.nombreProducto}">Producto</strong>
+                                    <br>
+                                    <small class="text-muted" th:text="'Stock disponible: ' + ${item.stockDisponible}">Stock</small>
+                                </td>
+                                <td class="text-center align-middle" style="color: #e0e0e0;">
+                                    Q <span th:text="${#numbers.formatDecimal(item.precio, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <form th:action="@{/tienda/actualizar}" method="post" class="d-inline">
+                                        <input type="hidden" name="codigoProducto" th:value="${item.codigoProducto}">
+                                        <div class="input-group input-group-sm justify-content-center">
+                                            <input type="number" name="cantidad"
+                                                   th:value="${item.cantidad}"
+                                                   min="1" th:max="${item.stockDisponible}"
+                                                   class="form-control cantidad-input"
+                                                   style="background: #1a1a1a; border: 1px solid #333333; color: #e0e0e0;">
+                                            <button type="submit" class="btn btn-outline-warning btn-sm">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td class="text-center align-middle" style="color: #D4AF37; font-weight: 500;">
+                                    Q <span th:text="${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <a th:href="@{/tienda/eliminar/{id}(id=${item.codigoProducto})}"
+                                       class="btn btn-outline-danger btn-sm"
+                                       onclick="return confirm('¿Eliminar este producto del carrito?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total y acciones -->
+            <div class="row">
+                <div class="col-md-6">
+                    <a th:href="@{/tienda/vaciar}"
+                       class="btn btn-outline-danger"
+                       onclick="return confirm('¿Vaciar todo el carrito?')">
+                        <i class="bi bi-trash"></i> Vaciar Carrito
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <div class="carrito-total">
+                            <span class="total-label">
+                                <i class="bi bi-cash-stack"></i> Total a Pagar:
+                            </span>
+                        <div class="total-valor mb-3">
+                            Q <span th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </div>
+
+                        <form th:action="@{/tienda/finalizar}" method="post">
+                            <!-- Selector de Vendedor -->
+                            <div class="mb-3">
+                                <label class="form-label text-start w-100" style="color: #D4AF37;">
+                                    <i class="bi bi-person-badge"></i> Seleccionar Vendedor:
+                                </label>
+                                <select name="codigoVendedor" class="form-select vendedor-select" required>
+                                    <option value="">-- Elija un vendedor --</option>
+                                    <option th:each="vendedor : ${vendedores}"
+                                            th:value="${vendedor.codigoUsuario}"
+                                            th:text="${vendedor.username} + ' (' + vendedor.rol + ')'">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100"
+                                    onclick="return confirm('¿Confirmar y finalizar la compra?')">
+                                <i class="bi bi-check-circle"></i> Finalizar Compra
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje si no hay vendedores -->
+            <div th:if="${vendedores == null || vendedores.isEmpty()}" class="alert alert-warning mt-3">
+                <i class="bi bi-exclamation-triangle"></i>
+                No hay vendedores disponibles. Contacte al administrador.
+            </div>
+
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
