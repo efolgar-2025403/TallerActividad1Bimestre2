@@ -426,14 +426,17 @@
     <div class="row">
         <!-- Sidebar -->
         <nav class="col-md-2 d-md-block sidebar p-0">
-            <div class="sidebar-brand">
-                <h4 class="mb-0">
-                    <i class="bi bi-gem"></i> KinalApp
+            <div class="sidebar-brand text-center">
+                <img th:src="@{/images/logoejfcdorado.png}"
+                     alt="Logo EJFC"
+                     style="height: 70px; width: auto; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));">
+                <h4 class="mb-0" style="color: #D4AF37;">
+                    KinalApp
                 </h4>
-                <small>Sistema de Ventas</small>
+                <small style="color: #888888;">Sistema de Ventas</small>
             </div>
             <ul class="nav flex-column">
-                <!-- TIENDA (NUEVO) -->
+                <!-- TIENDA -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/tienda/login}">
                         <i class="bi bi-shop"></i> Tienda
