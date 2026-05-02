@@ -1,18 +1,18 @@
 package com.everfolgar.kinalapp.controller.web;
 
 import com.everfolgar.kinalapp.entity.Producto;
-import com.everfolgar.kinalapp.entity.Usuario;
 import com.everfolgar.kinalapp.service.IProductoService;
 import com.everfolgar.kinalapp.service.IUsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/tienda")
@@ -22,23 +22,23 @@ public class TiendaController {
     private IProductoService productoService;
 
     @Autowired
-    private IUsuarioService usuarioService;  // NUEVO
+    private IUsuarioService usuarioService;
 
     @GetMapping("/catalogo")
-    public String mostrarCatalogo(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        String clienteDpi = (String) session.getAttribute("clienteDpi");
+    public String mostrarCatalogo(Model model, HttpSession session) {
+        // Obtener el usuario autenticado de Spring Security
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
-        if (clienteDpi == null) {
-            redirectAttributes.addFlashAttribute("mensaje", "Debe iniciar sesión para acceder a la tienda");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
-            return "redirect:/tienda/login";
-        }
+        // Guardar en sesión para compatibilidad con el carrito
+        session.setAttribute("clienteDpi", username);
+        session.setAttribute("clienteNombre", username);
 
         List<Producto> productos = productoService.listarProductosDisponibles();
-        List<LoginController.ItemCarrito> carrito = getCarritoFromSession(session);
+        List<CarritoController.ItemCarrito> carrito = getCarritoFromSession(session);
 
         model.addAttribute("productos", productos);
-        model.addAttribute("clienteNombre", session.getAttribute("clienteNombre"));
+        model.addAttribute("clienteNombre", username);
         model.addAttribute("cantidadItems", getCantidadTotal(carrito));
         model.addAttribute("titulo", "Catálogo de Productos");
         return "tienda/catalogo";
@@ -57,9 +57,9 @@ public class TiendaController {
             return "redirect:/tienda/catalogo";
         }
 
-        List<LoginController.ItemCarrito> carrito = getCarritoFromSession(session);
+        List<CarritoController.ItemCarrito> carrito = getCarritoFromSession(session);
 
-        LoginController.ItemCarrito itemExistente = carrito.stream()
+        CarritoController.ItemCarrito itemExistente = carrito.stream()
                 .filter(i -> i.getCodigoProducto().equals(codigoProducto))
                 .findFirst()
                 .orElse(null);
@@ -75,7 +75,7 @@ public class TiendaController {
                 redirectAttributes.addFlashAttribute("tipoMensaje", "error");
             }
         } else {
-            carrito.add(new LoginController.ItemCarrito(
+            carrito.add(new CarritoController.ItemCarrito(
                     producto.getCodigoProducto(),
                     producto.getNombreProducto(),
                     producto.getPrecio(),
@@ -91,8 +91,8 @@ public class TiendaController {
     }
 
     @SuppressWarnings("unchecked")
-    private List<LoginController.ItemCarrito> getCarritoFromSession(HttpSession session) {
-        List<LoginController.ItemCarrito> carrito = (List<LoginController.ItemCarrito>) session.getAttribute("carrito");
+    private List<CarritoController.ItemCarrito> getCarritoFromSession(HttpSession session) {
+        List<CarritoController.ItemCarrito> carrito = (List<CarritoController.ItemCarrito>) session.getAttribute("carrito");
         if (carrito == null) {
             carrito = new java.util.ArrayList<>();
             session.setAttribute("carrito", carrito);
@@ -100,7 +100,7 @@ public class TiendaController {
         return carrito;
     }
 
-    private int getCantidadTotal(List<LoginController.ItemCarrito> carrito) {
-        return carrito.stream().mapToInt(LoginController.ItemCarrito::getCantidad).sum();
+    private int getCantidadTotal(List<CarritoController.ItemCarrito> carrito) {
+        return carrito.stream().mapToInt(CarritoController.ItemCarrito::getCantidad).sum();
     }
 }
