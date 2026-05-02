@@ -9,12 +9,15 @@ import com.everfolgar.kinalapp.service.IUsuarioService;
 import com.everfolgar.kinalapp.service.IVentaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,15 +37,11 @@ public class CarritoController {
 
     @GetMapping("/carrito")
     public String verCarrito(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        String clienteDpi = (String) session.getAttribute("clienteDpi");
+        // Obtener el usuario autenticado de Spring Security
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
-        if (clienteDpi == null) {
-            redirectAttributes.addFlashAttribute("mensaje", "Debe iniciar sesión para acceder al carrito");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
-            return "redirect:/tienda/login";
-        }
-
-        List<LoginController.ItemCarrito> carrito = getCarritoFromSession(session);
+        List<ItemCarrito> carrito = getCarritoFromSession(session);
 
         if (carrito.isEmpty()) {
             redirectAttributes.addFlashAttribute("mensaje", "El carrito está vacío");
@@ -51,7 +50,7 @@ public class CarritoController {
         }
 
         BigDecimal total = carrito.stream()
-                .map(LoginController.ItemCarrito::getSubtotal)
+                .map(ItemCarrito::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Obtener lista de vendedores activos
@@ -63,7 +62,7 @@ public class CarritoController {
         model.addAttribute("items", carrito);
         model.addAttribute("total", total);
         model.addAttribute("vendedores", vendedores);
-        model.addAttribute("clienteNombre", session.getAttribute("clienteNombre"));
+        model.addAttribute("clienteNombre", username);
         model.addAttribute("titulo", "Carrito de Compras");
         return "tienda/carrito";
     }
@@ -73,7 +72,7 @@ public class CarritoController {
                                      @RequestParam Integer cantidad,
                                      HttpSession session,
                                      RedirectAttributes redirectAttributes) {
-        List<LoginController.ItemCarrito> carrito = getCarritoFromSession(session);
+        List<ItemCarrito> carrito = getCarritoFromSession(session);
 
         Producto producto = productoService.obtenerProductoPorId(codigoProducto);
 
@@ -103,7 +102,7 @@ public class CarritoController {
     public String eliminarItem(@PathVariable Integer codigoProducto,
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
-        List<LoginController.ItemCarrito> carrito = getCarritoFromSession(session);
+        List<ItemCarrito> carrito = getCarritoFromSession(session);
 
         carrito.removeIf(i -> i.getCodigoProducto().equals(codigoProducto));
         session.setAttribute("carrito", carrito);
@@ -117,8 +116,10 @@ public class CarritoController {
     public String finalizarCompra(@RequestParam(required = false) Integer codigoVendedor,
                                   HttpSession session,
                                   RedirectAttributes redirectAttributes) {
-        String clienteDpi = (String) session.getAttribute("clienteDpi");
-        List<LoginController.ItemCarrito> carrito = getCarritoFromSession(session);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        List<ItemCarrito> carrito = getCarritoFromSession(session);
 
         if (carrito.isEmpty()) {
             redirectAttributes.addFlashAttribute("mensaje", "El carrito está vacío");
@@ -135,7 +136,7 @@ public class CarritoController {
 
         try {
             // Validar stock antes de finalizar
-            for (LoginController.ItemCarrito item : carrito) {
+            for (ItemCarrito item : carrito) {
                 Producto producto = productoService.obtenerProductoPorId(item.getCodigoProducto());
                 if (producto == null || producto.getStock() < item.getCantidad()) {
                     redirectAttributes.addFlashAttribute("mensaje",
@@ -152,13 +153,13 @@ public class CarritoController {
 
             // Calcular total
             BigDecimal total = carrito.stream()
-                    .map(LoginController.ItemCarrito::getSubtotal)
+                    .map(ItemCarrito::getSubtotal)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             venta.setTotal(total);
 
             // Asignar cliente
             Cliente cliente = new Cliente();
-            cliente.setDPICliente(clienteDpi);
+            cliente.setDPICliente(username);
             venta.setCliente(cliente);
 
             // Asignar vendedor seleccionado
@@ -177,14 +178,14 @@ public class CarritoController {
             ventaService.guardarVenta(venta);
 
             // Actualizar stock de productos
-            for (LoginController.ItemCarrito item : carrito) {
+            for (ItemCarrito item : carrito) {
                 Producto producto = productoService.obtenerProductoPorId(item.getCodigoProducto());
                 producto.setStock(producto.getStock() - item.getCantidad());
                 productoService.guardarProducto(producto);
             }
 
             // Limpiar carrito
-            session.setAttribute("carrito", new java.util.ArrayList<LoginController.ItemCarrito>());
+            session.setAttribute("carrito", new ArrayList<ItemCarrito>());
 
             redirectAttributes.addFlashAttribute("mensaje",
                     "¡Compra finalizada con éxito! Total: Q " + total + " | Vendedor: " + vendedor.getUsername());
@@ -200,17 +201,17 @@ public class CarritoController {
 
     @GetMapping("/vaciar")
     public String vaciarCarrito(HttpSession session, RedirectAttributes redirectAttributes) {
-        session.setAttribute("carrito", new java.util.ArrayList<LoginController.ItemCarrito>());
+        session.setAttribute("carrito", new ArrayList<ItemCarrito>());
         redirectAttributes.addFlashAttribute("mensaje", "Carrito vaciado correctamente");
         redirectAttributes.addFlashAttribute("tipoMensaje", "success");
         return "redirect:/tienda/catalogo";
     }
 
     @SuppressWarnings("unchecked")
-    private List<LoginController.ItemCarrito> getCarritoFromSession(HttpSession session) {
-        List<LoginController.ItemCarrito> carrito = (List<LoginController.ItemCarrito>) session.getAttribute("carrito");
+    private List<ItemCarrito> getCarritoFromSession(HttpSession session) {
+        List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");
         if (carrito == null) {
-            carrito = new java.util.ArrayList<>();
+            carrito = new ArrayList<>();
             session.setAttribute("carrito", carrito);
         }
         return carrito;
@@ -218,5 +219,47 @@ public class CarritoController {
 
     private Integer generarCodigoVenta() {
         return (int) (System.currentTimeMillis() % 1000000);
+    }
+
+    // CLASE INTERNA ItemCarrito
+    public static class ItemCarrito {
+        private Integer codigoProducto;
+        private String nombreProducto;
+        private BigDecimal precio;
+        private Integer cantidad;
+        private Integer stockDisponible;
+        private BigDecimal subtotal;
+
+        public ItemCarrito() {}
+
+        public ItemCarrito(Integer codigoProducto, String nombreProducto,
+                           BigDecimal precio, Integer cantidad, Integer stockDisponible) {
+            this.codigoProducto = codigoProducto;
+            this.nombreProducto = nombreProducto;
+            this.precio = precio;
+            this.cantidad = cantidad;
+            this.stockDisponible = stockDisponible;
+            this.subtotal = precio.multiply(new BigDecimal(cantidad));
+        }
+
+        public BigDecimal getSubtotal() {
+            return precio.multiply(new BigDecimal(cantidad));
+        }
+
+        // Getters y Setters
+        public Integer getCodigoProducto() { return codigoProducto; }
+        public void setCodigoProducto(Integer codigoProducto) { this.codigoProducto = codigoProducto; }
+        public String getNombreProducto() { return nombreProducto; }
+        public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
+        public BigDecimal getPrecio() { return precio; }
+        public void setPrecio(BigDecimal precio) { this.precio = precio; }
+        public Integer getCantidad() { return cantidad; }
+        public void setCantidad(Integer cantidad) {
+            this.cantidad = cantidad;
+            this.subtotal = this.precio.multiply(new BigDecimal(cantidad));
+        }
+        public Integer getStockDisponible() { return stockDisponible; }
+        public void setStockDisponible(Integer stockDisponible) { this.stockDisponible = stockDisponible; }
+        public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
     }
 }
