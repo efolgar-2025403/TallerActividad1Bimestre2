@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Perfil del Programador</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="col-12">
+
+            <!-- Cabecera del perfil -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <img th:src="@{/images/desarrollador.jpg}"
+                         alt="Foto de Perfil"
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);">
+                </div>
+                <h1 class="display-5 fw-bold" style="color: #D4AF37;" th:text="${nombre}">Ever Folgar</h1>
+                <h3 class="mb-3" style="color: #cccccc;" th:text="${titulo}">Desarrollador Junior</h3>
+                <div style="color: #888888; max-width: 700px; margin: 0 auto;">
+                    <i class="bi bi-quote" style="color: #D4AF37;"></i>
+                    <span th:text="${descripcion}">Descripción</span>
+                </div>
+            </div>
+
+            <!-- Contacto rápido -->
+            <div class="row text-center mb-5">
+                <div class="col-md-6 mb-3">
+                    <div class="card" style="background: #1a1a1a; border: 1px solid #D4AF37;">
+                        <div class="card-body">
+                            <i class="bi bi-envelope-fill" style="color: #D4AF37; font-size: 1.5rem;"></i>
+                            <p class="mb-0 mt-2" style="color: #e0e0e0;" th:text="${email}">efolgar-2025403@kinal.edu.gt</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card" style="background: #1a1a1a; border: 1px solid #D4AF37;">
+                        <div class="card-body">
+                            <i class="bi bi-telephone-fill" style="color: #D4AF37; font-size: 1.5rem;"></i>
+                            <p class="mb-0 mt-2" style="color: #e0e0e0;" th:text="${telefono}">+502 5943-2674</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Habilidades Técnicas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-cpu"></i> Habilidades Técnicas
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                            <span th:each="skill : ${habilidades}"
+                                  class="badge"
+                                  style="background: #1a1a1a; color: #D4AF37; border: 1px solid #D4AF37; padding: 8px 16px; font-size: 0.9rem;"
+                                  th:text="${skill}">Java</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proyectos Destacados -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-folder2-open"></i> Proyectos Destacados
+                </div>
+                <div class="card-body">
+                    <div th:each="proyecto, iterStat : ${proyectos}"
+                         class="mb-4"
+                         th:classappend="${!iterStat.last} ? 'pb-3' : ''"
+                         th:style="${!iterStat.last} ? 'border-bottom: 1px solid #333333;' : ''">
+                        <h4 style="color: #D4AF37;" th:text="${proyecto.nombre}">Nombre Proyecto</h4>
+                        <p style="color: #cccccc;" th:text="${proyecto.descripcion}">Descripción</p>
+                        <div>
+                                <span class="badge"
+                                      style="background: #0d0d0d; color: #D4AF37; border: 1px solid #D4AF37; padding: 6px 12px;"
+                                      th:text="${proyecto.tecnologias}">Tecnologías</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experiencia Académica -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-briefcase-fill"></i> Experiencia Académica
+                </div>
+                <div class="card-body">
+                    <div th:each="exp, iterStat : ${experiencias}"
+                         class="mb-4"
+                         th:classappend="${!iterStat.last} ? 'pb-3' : ''"
+                         th:style="${!iterStat.last} ? 'border-bottom: 1px solid #333333;' : ''">
+                        <div class="d-flex justify-content-between flex-wrap align-items-center mb-2">
+                            <span style="color: #D4AF37; font-weight: 500; font-size: 1.1rem;" th:text="${exp.cargo}">Cargo</span>
+                            <span class="badge" style="background: #1a1a1a; color: #D4AF37; border: 1px solid #D4AF37;" th:text="${exp.periodo}">Periodo</span>
+                        </div>
+                        <div style="color: #888888; margin-bottom: 8px;" th:text="${exp.empresa}">Empresa</div>
+                        <p style="color: #cccccc; margin-bottom: 0;" th:text="${exp.descripcion}">Descripción</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Redes Sociales -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-share-fill"></i> Conéctate Conmigo
+                </div>
+                <div class="card-body text-center">
+                    <a th:href="${github}" target="_blank" class="btn btn-outline-warning me-3">
+                        <i class="bi bi-github"></i> GitHub
+                    </a>
+                    <a th:href="'mailto:' + ${email}" class="btn btn-outline-warning">
+                        <i class="bi bi-envelope-fill"></i> Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer estilo terminal -->
+            <div class="text-center mt-4 mb-3">
+                <div style="background: #1a1a1a; border: 1px solid #333333; border-radius: 8px; padding: 15px; display: inline-block;">
+                    <i class="bi bi-terminal-fill" style="color: #D4AF37;"></i>
+                    <span style="color: #D4AF37; font-weight: 500;">$</span>
+                    <span style="color: #e0e0e0;"> echo "Disponible para nuevos desafíos"</span>
+                    <span class="ms-2" style="color: #D4AF37; animation: blink 1s infinite;">█</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Estilo para el cursor parpadeante -->
+    <style>
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</th:block>
+</body>
+</html>

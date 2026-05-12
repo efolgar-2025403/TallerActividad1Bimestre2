@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Productos</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-3">
+        <a th:href="@{/web/productos/nuevo}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Producto
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="dataTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="producto : ${productos}">
+                        <td th:text="${producto.codigoProducto}"></td>
+                        <td th:text="${producto.nombreProducto}"></td>
+                        <td th:text="${producto.descripcion}"></td>
+                        <td th:text="'Q ' + ${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 2, 'POINT')}"></td>
+                        <td th:text="${producto.stock}"></td>
+                        <td>
+                                    <span class="badge"
+                                          th:classappend="${producto.estado == 1} ? 'bg-success' : 'bg-danger'"
+                                          th:text="${producto.estado == 1} ? 'Activo' : 'Inactivo'"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/web/productos/editar/{id}(id=${producto.codigoProducto})}"
+                               class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/web/productos/eliminar/{id}(id=${producto.codigoProducto})}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('¿Eliminar este producto?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

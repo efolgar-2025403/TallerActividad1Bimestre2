@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${titulo}">Formulario Venta</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" th:text="${titulo}"></h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/web/ventas/guardar}" th:object="${venta}" method="post">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Código *</label>
+                                <input type="number" class="form-control"
+                                       th:field="*{codigoVenta}"
+                                       th:readonly="${venta.codigoVenta != null}"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha *</label>
+                                <input type="date" class="form-control"
+                                       th:field="*{fechaVenta}" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">DPI del Cliente *</label>
+                                <input type="text" class="form-control"
+                                       name="cliente.DPICliente"
+                                       th:value="${venta.cliente?.DPICliente}"
+                                       placeholder="Ej: 1234567890101" required>
+                                <small class="text-muted">Ingrese el DPI del cliente</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Código del Vendedor *</label>
+                                <input type="number" class="form-control"
+                                       name="usuario.codigoUsuario"
+                                       th:value="${venta.usuario?.codigoUsuario}"
+                                       placeholder="Ej: 1" required>
+                                <small class="text-muted">Ingrese el código del vendedor</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Total *</label>
+                                <input type="number" step="0.01" class="form-control"
+                                       th:field="*{total}" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" th:field="*{estado}">
+                                    <option value="1">Activa</option>
+                                    <option value="0">Cancelada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                            <a th:href="@{/web/ventas}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información de ayuda -->
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Información de Referencia
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Clientes Disponibles:</h6>
+                            <ul class="list-unstyled">
+                                <li th:each="cliente : ${clientes}" class="mb-2">
+                                    <strong th:text="${cliente.DPICliente}"></strong> -
+                                    <span th:text="${cliente.nombreCliente + ' ' + cliente.apellidoCliente}"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Vendedores Disponibles:</h6>
+                            <ul class="list-unstyled">
+                                <li th:each="usuario : ${usuarios}" class="mb-2">
+                                    <strong th:text="${usuario.codigoUsuario}"></strong> -
+                                    <span th:text="${usuario.username}"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
